@@ -1,30 +1,19 @@
 import axios from 'axios';
-// import SInfo from 'react-native-secure-storage';
-
-// const secureStoreOptions = {
-//   sharedPreferencesName: 'myAppPrefs',
-//   keychainService: 'myAppKeychain'
-// };
-
-// const publicApiClient = axios.create({
-//   baseURL: 'http://172.20.10.3:8082/api/app'
-// });
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8081/api/admin',
+  baseURL: 'http://localhost:5261',
 });
 
-// apiClient.interceptors.request.use(async (config) => {
-//   try {
-//     const token = await SInfo.getItem('accessToken', secureStoreOptions);
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//   } catch (error) {
-//     console.error('Error retrieving access token:', error);
-//   }
-//   return config;
-// }, error => Promise.reject(error));
-
+apiClient.interceptors.request.use((config) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.error('Error retrieving access token:', error);
+  }
+  return config;
+}, error => Promise.reject(error));
 
 export { apiClient };
