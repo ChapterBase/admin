@@ -16,13 +16,17 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
+import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { Link, Routes, Route } from 'react-router-dom';
 import Dashboard from '../pages/Dashboard';
 import Books from '../pages/Books';
 import Settings from '../pages/Settings';
-import ViewAd from '../pages/ViewBook';
+import ViewBook from '../pages/ViewBook';
+import UpdateBook from '../pages/UpdateBook';
+import CreateBook from '../pages/CreateBook';
+import Customers from '../pages/Customers';
 
 const drawerWidth = 240;
 
@@ -117,7 +121,7 @@ export default function Sidenav() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Annexify
+                        Chapter Base Admin
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -141,6 +145,12 @@ export default function Sidenav() {
                         </ListItemIcon>
                         <ListItemText primary="Books" />
                     </ListItemButton>
+                    <ListItemButton component={Link} to="/customers">
+                        <ListItemIcon>
+                            <PeopleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Customers" />
+                    </ListItemButton>
                     <Divider />
                     <ListItemButton component={Link} to="/settings">
                         <ListItemIcon>
@@ -154,9 +164,15 @@ export default function Sidenav() {
                 <DrawerHeader />
                 <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
+
                     <Route path="/books" element={<Books />} />
+                    <Route path="/create-book" element={<CreateBook />} />
+                    <Route path="/view-book/:id" element={<ViewBook />} />
+                    <Route path="/update-book/:id" element={<UpdateBook />} />
+
+                    <Route path="/customers" element={<Customers />} />
+
                     <Route path="/settings" element={<Settings />} />
-                    <Route path="/view-book/:id" element={<ViewAd />} />
                 </Routes>
             </Box>
         </Box>

@@ -1,70 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Typography, Paper, CircularProgress, Grid, ImageList, ImageListItem } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Typography, Paper, CircularProgress, Box, TextField, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Grid from '@mui/material/Grid2'; // Correct import statement for Grid2
 import { apiClient } from '../services/ApiService';
+import dayjs from 'dayjs';
 
-function ViewAd() {
+const statusMapping = {
+  PUBLISH: "Publish",
+  PREVIEW: "Preview",
+  DELETED: "Deleted"
+};
+
+function ViewBook() {
   const { id } = useParams();
-  const [ad, setAd] = useState(null);
+  const navigate = useNavigate();
+  const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [thumbnailData, setThumbnailData] = useState(null);
-  const [imageData, setImageData] = useState([]);
 
   useEffect(() => {
-    const fetchAd = async () => {
+    const fetchBook = async () => {
       try {
-        const response = await apiClient.get(`/post/by/id?id=${id}`);
-        setAd(response.data);
+        const response = await apiClient.get(`/Book/${id}`);
+        setBook(response.data.data);
         setLoading(false);
-
-        if (response.data.thumbnail) {
-          fetchImage(response.data.thumbnail, setThumbnailData);
-        }
-
-        if (response.data.images && response.data.images.length > 0) {
-          response.data.images.forEach(image => {
-            fetchImage(image, (data) => {
-              setImageData(prevData => [...prevData, data]);
-            });
-          });
-        }
       } catch (error) {
-        console.error('Failed to fetch ad:', error);
-        setError('Failed to fetch ad');
+        console.error('Failed to fetch book:', error);
+        setError('Failed to fetch book');
         setLoading(false);
       }
     };
 
-    fetchAd();
+    fetchBook();
   }, [id]);
 
-  const fetchImage = async (fileName, setImage) => {
-    try {
-      const response = await apiClient.get('/file-uploader', {
-        params: { fileName: `/${fileName}` },
-        responseType: 'arraybuffer'
-      });
-      const base64Flag = 'data:image/jpeg;base64,';
-      const imageStr = arrayBufferToBase64(response.data);
-      setImage(base64Flag + imageStr);
-    } catch (error) {
-      console.error('Error fetching and processing image:', error);
-    }
-  };
-
-  const arrayBufferToBase64 = (buffer) => {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  };
-
   if (loading) {
-    return <CircularProgress />;
+    return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
   }
 
   if (error) {
@@ -73,41 +45,140 @@ function ViewAd() {
 
   return (
     <Paper style={{ padding: '20px', marginTop: '20px' }}>
-      <Typography variant="h4" gutterBottom>Ad Details</Typography>
-      {ad && (
+      <Box display="flex" alignItems="center" mb={2}>
+        <IconButton onClick={() => navigate('/books')}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h4" style={{ marginLeft: 10 }}>
+          Book Details
+        </Typography>
+      </Box>
+      {book && (
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h6"><strong>Title:</strong> {ad.title}</Typography>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Title"
+              value={book.title}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
           </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6"><strong>Description:</strong> {ad.description}</Typography>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Author"
+              value={book.author}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
           </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6"><strong>Created At:</strong> {new Date(ad.createdAt).toLocaleString()}</Typography>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="ISBN"
+              value={book.isbn}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
           </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6"><strong>Updated At:</strong> {new Date(ad.updatedAt).toLocaleString()}</Typography>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Publisher"
+              value={book.publisher}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
           </Grid>
-          {thumbnailData && (
-            <Grid item xs={12}>
-              <img src={thumbnailData} alt="Thumbnail" style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }} />
-            </Grid>
-          )}
-          {imageData.length > 0 && (
-            <Grid item xs={12}>
-              <ImageList cols={3} rowHeight={164}>
-                {imageData.map((image, index) => (
-                  <ImageListItem key={index}>
-                    <img src={image} alt={`Image ${index + 1}`} />
-                  </ImageListItem>
-                ))}
-              </ImageList>
-            </Grid>
-          )}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Quantity"
+              value={book.quantity}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Price"
+              value={`$${book.price}`}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Status"
+              value={statusMapping[book.status] || book.status}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Published Date"
+              value={dayjs(book.publishedDate).format('YYYY-MM-DD')}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Created At"
+              value={dayjs(book.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Updated At"
+              value={dayjs(book.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
+              fullWidth
+              slotProps={{
+                input: { readOnly: true },
+              }}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
         </Grid>
       )}
     </Paper>
   );
 }
 
-export default ViewAd;
+export default ViewBook;

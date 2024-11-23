@@ -58,6 +58,12 @@ function AppContent() {
           });
 
           console.log('Token endpoint response status:', response.status);
+          if (response.status !== 200) {
+            console.error('Token exchange failed with status:', response.status);
+            setLoading(false); // Stop loading if there's an error
+            return;
+          }
+
           const data = await response.json();
           console.log('Token response data:', data);
 
@@ -127,7 +133,6 @@ function AppContent() {
     </div>
   );
 }
-
 
 // Helper Functions for PKCE
 function generateCodeVerifier() {

@@ -1,12 +1,16 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5261',
+  baseURL: 'https://localhost:7069'
+  // baseURL: 'http://localhost:5261'
 });
 
 apiClient.interceptors.request.use((config) => {
   try {
     const token = localStorage.getItem('accessToken');
+
+    console.log('Access token retrieved from localStorage:', token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -19,11 +23,9 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   response => response,
   error => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('idToken');
-      window.location.href = '/login'; // Redirect to login page
-    }
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('idToken');
+    window.location.href = '/login';
     return Promise.reject(error);
   }
 );
