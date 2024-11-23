@@ -17,12 +17,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
-import AdsClickIcon from '@mui/icons-material/AdsClick';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { Link, Routes, Route } from 'react-router-dom';
 import Dashboard from '../pages/Dashboard';
-import Ads from '../pages/Ads';
+import Books from '../pages/Books';
 import Settings from '../pages/Settings';
-import ViewAd from '../pages/ViewAd';
+import ViewAd from '../pages/ViewBook';
 
 const drawerWidth = 240;
 
@@ -135,11 +135,11 @@ export default function Sidenav() {
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItemButton>
-                    <ListItemButton component={Link} to="/ads">
+                    <ListItemButton component={Link} to="/books">
                         <ListItemIcon>
-                            <AdsClickIcon />
+                            <MenuBookIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Ads" />
+                        <ListItemText primary="Books" />
                     </ListItemButton>
                     <Divider />
                     <ListItemButton component={Link} to="/settings">
@@ -154,9 +154,9 @@ export default function Sidenav() {
                 <DrawerHeader />
                 <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/ads" element={<Ads />} />
+                    <Route path="/books" element={<Books />} />
                     <Route path="/settings" element={<Settings />} />
-                    <Route path="/view-ad/:id" element={<ViewAd />} />
+                    <Route path="/view-book/:id" element={<ViewAd />} />
                 </Routes>
             </Box>
         </Box>

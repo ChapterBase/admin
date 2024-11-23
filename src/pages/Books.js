@@ -21,66 +21,57 @@ import { apiClient } from '../services/ApiService';
 import dayjs from 'dayjs';
 
 const statusMapping = {
-  All: "All",
-  Active: "ACTIVE",
-  Inactive: "INACTIVE",
-  Deleted: "DELETED",
-  Approved: "APPROVED",
-  Rejected: "REJECTED",
-  "Approval Pending": "APPROVAL_PENDING"
+  All: "ALL",
+  Publish: "PUBLISH",
+  Preview: "PREVIEW",
+  Deleted: "DELETED"
 };
 
-function Ads() {
-  const [ads, setAds] = useState([]);
+function Books() {
+  const [books, setBooks] = useState([]);
   const [status, setStatus] = useState('All');
-  const [fromDate, setFromDate] = useState(dayjs().subtract(28, 'day'));
-  const [toDate, setToDate] = useState(dayjs());
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [error, setError] = useState('');
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
   const navigate = useNavigate();
 
-  const fetchAds = async () => {
-    if (!fromDate || !toDate) {
-      setError('From Date and To Date are required');
-      return;
-    }
-
-    const allStatuses = ["ACTIVE", "INACTIVE", "DELETED", "APPROVED", "REJECTED", "APPROVAL_PENDING"];
+  const fetchBooks = async () => {
     const requestData = {
-      statuses: status === "All" ? allStatuses : (status ? [statusMapping[status]] : []),
-      fromDate: new Date(fromDate).toISOString(),
-      toDate: new Date(toDate).toISOString(),
+      status: statusMapping[status],
       page: page,
       size: size,
+      fromDate: fromDate ? fromDate.toISOString() : null,
+      toDate: toDate ? toDate.toISOString() : null,
     };
   
     try {
-      const response = await apiClient.post('/post', requestData);
-      setAds(response.data);
+      const response = await apiClient.post('/Book/All', requestData);
+      setBooks(response.data);
       setError(''); // Clear error message
     } catch (error) {
-      console.error('Failed to fetch ads:', error);
-      setError('Failed to fetch ads');
+      console.error('Failed to fetch books:', error);
+      setError('Failed to fetch books');
     }
   };
 
   useEffect(() => {
-    fetchAds();
-  }, [page, size]); // Fetch ads on initial render and when page or size changes
+    fetchBooks();
+  }, [page, size]); // Fetch books on initial render and when page or size changes
 
   const handleSearch = () => {
-    fetchAds();
+    fetchBooks();
   };
 
   const handleView = (id) => {
-    navigate(`/view-ad/${id}`);
+    navigate(`/view-book/${id}`);
   };
 
   return (
     <div>
-      <Typography variant="h4">Ads</Typography>
-      <Typography>Manage and verify ads here.</Typography>
+      <Typography variant="h4">Books</Typography>
+      <Typography>Manage and verify books here.</Typography>
 
       <div style={{ margin: '20px 0', display: 'flex', gap: '10px', alignItems: 'center' }}>
         <Select
@@ -120,22 +111,34 @@ function Ads() {
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Author</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>ISBN</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Publisher</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Price</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Published Date</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Created At</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Updated At</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {ads.map((ad) => (
-              <TableRow key={ad.id} onDoubleClick={() => handleView(ad.id)}>
-                <TableCell>{ad.id}</TableCell>
-                <TableCell>{ad.title}</TableCell>
-                <TableCell>{ad.description}</TableCell>
-                <TableCell>{ad.createdAt}</TableCell>
-                <TableCell>{ad.updatedAt}</TableCell>
+            {books.map((book) => (
+              <TableRow key={book.id} onDoubleClick={() => handleView(book.id)}>
+                <TableCell>{book.id}</TableCell>
+                <TableCell>{book.title}</TableCell>
+                <TableCell>{book.author}</TableCell>
+                <TableCell>{book.isbn}</TableCell>
+                <TableCell>{book.publisher}</TableCell>
+                <TableCell>{book.quantity}</TableCell>
+                <TableCell>{book.price}</TableCell>
+                <TableCell>{book.status}</TableCell>
+                <TableCell>{dayjs(book.publishedDate).format('YYYY-MM-DD')}</TableCell>
+                <TableCell>{dayjs(book.createdAt).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
+                <TableCell>{dayjs(book.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
                 <TableCell>
-                  <Button variant="contained" onClick={() => handleView(ad.id)}>
+                  <Button variant="contained" onClick={() => handleView(book.id)}>
                     Update
                   </Button>
                 </TableCell>
@@ -148,4 +151,4 @@ function Ads() {
   );
 }
 
-export default Ads;
+export default Books;

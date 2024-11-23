@@ -16,4 +16,16 @@ apiClient.interceptors.request.use((config) => {
   return config;
 }, error => Promise.reject(error));
 
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('idToken');
+      window.location.href = '/login'; // Redirect to login page
+    }
+    return Promise.reject(error);
+  }
+);
+
 export { apiClient };
